@@ -12,7 +12,7 @@
     using Microsoft.Azure.Documents.Linq;
 
     public static class DocDBClass<T> where T : class
-    {NORTHAMERICA\Source\Repos
+    {
         private static readonly string DatabaseId = ConfigurationManager.AppSettings["database"];
         private static readonly string CollectionId = ConfigurationManager.AppSettings["collection"];
         private static DocumentClient client;
