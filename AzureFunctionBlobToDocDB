@@ -1,0 +1,35 @@
+#r "Newtonsoft.Json"
+using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+public static void Run(string myBlob, ICollector<string> outputDocument, TraceWriter log)
+{
+  log.Verbose($"C# Blob trigger function processed: {myBlob}");
+  // outputDocument = "";
+  for (int a = 0; a < 3; a = a + 1)
+  {
+    dynamic traffic = JObject.Parse(myBlob)["resourceSets"][0]["resources"][a];
+    var location = new System.Net.WebClient().DownloadString($"http://dev.virtualearth.net/REST/v1/Locations/{traffic["point"]["coordinates"][0]},{traffic["point"]["coordinates"][1]}?o=json&key=ApXuji65WtcU8Kb_5oGaz1MKu77YMjO6hb2mxyLbTiVs00inmldvQeVWCLB0fHnb");
+    dynamic location_json = JObject.Parse(location)["resourceSets"][0]["resources"][0];
+    object document = new
+      {
+      id = traffic["id"],
+      address = location_json["address"]["addressLine"],
+      city = location_json["address"]["locality"],
+      state = location_json["address"]["adminDistrict"],
+      description = traffic["description"],
+      end = traffic["end"],
+      lastModified = traffic["lastModified"],
+      roadClosed = traffic["roadClosed"],
+      severity = traffic["severity"],
+      source = traffic["source"],
+      start = traffic["start"],
+      type = traffic["type"],
+      verified = traffic["verified"],
+      comment = traffic["comment"],
+      latitude = traffic["point"]["coordinates"][0],
+      longitude = traffic["point"]["coordinates"][1]
+    };
+    string json = JsonConvert.SerializeObject(document);
+    outputDocument.Add(json);
+  }
